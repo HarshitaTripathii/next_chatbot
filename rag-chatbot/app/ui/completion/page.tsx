@@ -5,7 +5,7 @@ import { useState } from "react";
 export default function CompletionPage() {
   // usetStates
   const [prompt, setPrompt] = useState("");
-  const [error, setError] = useState<String | null>(null);
+  const [error, setError] = useState<string | null>(null);
   // completion has ai response: data.text
   const [completion, setCompletion] = useState("");
   // isLoading means, ai is generating answers
@@ -21,10 +21,11 @@ export default function CompletionPage() {
     setIsLoading(true);
     // old answer is removed while the new request is loading.
     setCompletion("");
+    setError(null);
     // collect ai response , and update the completion
 
     try {
-      const response = await fetch("api/completion", {
+      const response = await fetch("/api/completion", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,12 +38,12 @@ export default function CompletionPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Something went wrong");
+        throw new Error(data?.error || "Something went wrong");
       }
       // now update the new ai repsonse
-      setCompletion(data.text);
+      setCompletion(data?.text || "");
     } catch (error) {
-      console.log("Error:", error);
+      console.error("Error:", error);
       setError(
         error instanceof Error
           ? error.message
@@ -78,8 +79,10 @@ export default function CompletionPage() {
             }}
           ></input>
 
-          <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
+          >
             Send
           </button>
         </div>
